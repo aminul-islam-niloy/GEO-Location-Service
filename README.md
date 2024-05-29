@@ -77,7 +77,7 @@ Distributed under the MIT License. See `LICENSE` for more information.
 Ensure you have a screenshot of your application in the `icons` folder named `screenshot.png`. Replace the `icons/screenshot.png` in the markdown with the path to your actual screenshot.
 
 
-![Notification Image](https://github.com/aminul-islam-niloy/Notification-Service-for-ASP.NET-core-/blob/master/Notification%20Management/wwwroot/notification.png?raw=true)
+
 
 
 ### Adding CRUD Functionality
@@ -87,3 +87,7 @@ Ensure you have a `FriendsController` and corresponding views for CRUD operation
 
 By following these instructions and ensuring that your project is structured correctly, you should have a functional web application with CRUD operations for friends and mapping functionalities.
 ```
+
+### Snapshot
+
+![Notification Image](https://github.com/aminul-islam-niloy/GEO-Location-Service/blob/master/GEO%20Location%20Service/wwwroot/Icons/Google%20map.png?raw=true)
