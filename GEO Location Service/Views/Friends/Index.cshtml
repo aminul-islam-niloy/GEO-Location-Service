@@ -2,6 +2,13 @@
 
 @{
     ViewData["Title"] = "Index";
+    var friendsJson = System.Text.Json.JsonSerializer.Serialize(Model.Select(friend => new
+    {
+        id = friend.Id,
+        name = friend.Name,
+        lat = friend.Let,
+        lon = friend.Lon
+    }));
 }
 
 <h1>Index</h1>
@@ -67,68 +74,90 @@
 
     var friendIcons = [
         L.icon({
-            iconUrl: 'Icons/3001764.png',
+            iconUrl: '/icons/3001764.png',
             iconSize: [25, 41],
             iconAnchor: [12, 41],
             popupAnchor: [1, -34],
         }),
         L.icon({
-            iconUrl: 'Icons/146031.png',
+            iconUrl: '/icons/146031.png',
             iconSize: [25, 41],
             iconAnchor: [12, 41],
             popupAnchor: [1, -34],
         }),
         L.icon({
-            iconUrl: 'icons/man_person17.png',
+            iconUrl: '/icons/man_person17.png',
             iconSize: [25, 41],
             iconAnchor: [12, 41],
             popupAnchor: [1, -34],
         })
     ];
 
-    // Automatically show user's current location on page load
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+        function toRad(x) {
+            return x * Math.PI / 180;
+        }
+
+        var R = 6371; // Radius of the earth in km
+        var dLat = toRad(lat2 - lat1);
+        var dLon = toRad(lon2 - lon1);
+        var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        var d = R * c; // Distance in km
+        return d;
+    }
+
+    var friends = @Html.Raw(friendsJson);
+
+    friends.forEach(function (friend, index) {
+        L.marker([friend.lat, friend.lon], {
+            icon: friendIcons[index % friendIcons.length]
+        }).addTo(map)
+            .bindPopup(friend.name);
+    });
+
+    // Automatically find nearest friend and draw path
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function (position) {
             var lat = position.coords.latitude;
             var lon = position.coords.longitude;
 
-            map.setView([lat, lon], 13);
-
-            L.marker([lat, lon], {
+            var myLocationMarker = L.marker([lat, lon], {
                 icon: L.icon({
-                    iconUrl: 'icons/profile-pic (10).png',
+                    iconUrl: 'Icons/profile-pic (10).png',
                     iconSize: [25, 41],
                     iconAnchor: [12, 41],
                     popupAnchor: [1, -34],
                 })
             }).addTo(map)
-                .bindPopup('Me')
+                .bindPopup('You')
                 .openPopup();
+
+            var nearestFriend = null;
+            var nearestDistance = Infinity;
+
+            friends.forEach(function (friend) {
+                var distance = calculateDistance(lat, lon, friend.lat, friend.lon);
+
+                if (distance < nearestDistance) {
+                    nearestDistance = distance;
+                    nearestFriend = friend;
+                }
+            });
+
+            if (nearestFriend) {
+                L.polyline([
+                    [lat, lon],
+                    [nearestFriend.lat, nearestFriend.lon]
+                ], { color: 'blue' }).addTo(map)
+                    .bindPopup('Shortest path to ' + nearestFriend.name + ' (' + nearestDistance.toFixed(2) + ' km)');
+            }
         }, function () {
             alert('Geolocation failed.');
         });
     } else {
         alert('Geolocation is not supported by this browser.');
     }
-
-    // Loop through friends data
-    @foreach (var friend in Model)
-    {
-        <text>
-            L.marker([@friend.Let, @friend.Lon], { icon: friendIcons[@friend.Id % friendIcons.length] })
-                .addTo(map)
-                .bindPopup('@friend.Name')
-                .openPopup();
-        </text>
-    }
 </script>
-
-
-
-
-
-
-
-
-
-
