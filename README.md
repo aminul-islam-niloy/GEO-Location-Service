@@ -1,4 +1,4 @@
-# GEO Location Service
+### GEO Location Service
 
 A web application to track friends' locations and find the shortest route to meet them using Leaflet and Leaflet Routing Machine.
 
@@ -70,23 +70,11 @@ A web application to track friends' locations and find the shortest route to mee
 
 Distributed under the MIT License. See `LICENSE` for more information.
 
-```
-
-### Example Screenshot
-
-Ensure you have a screenshot of your application in the `icons` folder named `screenshot.png`. Replace the `icons/screenshot.png` in the markdown with the path to your actual screenshot.
-
-
-
-
 
 ### Adding CRUD Functionality
-
 Ensure you have a `FriendsController` and corresponding views for CRUD operations:
-
-
 By following these instructions and ensuring that your project is structured correctly, you should have a functional web application with CRUD operations for friends and mapping functionalities.
-```
+
 
 ### Snapshot
 
