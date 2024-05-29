@@ -19,8 +19,7 @@ A web application to track friends' locations and find the shortest route to mee
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/your-username/geo-location-service.git
-   cd geo-location-service
+   git clone https://github.com/aminul-islam-niloy/GEO-Location-Service.git
    ```
 
 2. **Install .NET dependencies**
@@ -29,11 +28,7 @@ A web application to track friends' locations and find the shortest route to mee
    dotnet restore
    ```
 
-3. **Install front-end dependencies**
-
-   ```bash
-   npm install
-   ```
+3. **Install leaflet**
 
 4. **Run the application**
 
@@ -81,36 +76,9 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 Ensure you have a screenshot of your application in the `icons` folder named `screenshot.png`. Replace the `icons/screenshot.png` in the markdown with the path to your actual screenshot.
 
-### Project Structure
 
-Make sure your project has the necessary folders and files. Here is a simplified example structure:
+![App Screenshot](https://raw.githubusercontent.com/aminul-islam-niloy/GEO-Location-Service/main/icons/Google map.png "App Screenshot")
 
-```
-
-geo-location-service/
-├── Controllers/
-│ └── FriendsController.cs
-├── Models/
-│ └── Friend.cs
-├── Views/
-│ └── Friends/
-│ └── Index.cshtml
-├── wwwroot/
-│ └── icons/
-│ └── 3001764.png
-│ └── 146031.png
-│ └── man_person17.png
-│ └── screenshot.png
-├── geo-location-service.csproj
-├── package.json
-├── Program.cs
-├── README.md
-└── Startup.cs
-
-```
-
-
-![Notification Image](https://github.com/aminul-islam-niloy/Notification-Service-for-ASP.NET-core-/blob/master/Notification%20Management/wwwroot/notification.png?raw=true)
 
 ### Adding CRUD Functionality
 
