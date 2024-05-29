@@ -61,9 +61,12 @@
 </table>
 
 <div id="map" style="width:100%; height:500px"></div>
+<div id="status-message" style="margin-top: 20px; color: red;"></div>
 
-<script src="~/lib/leaflet/leaflet.js"></script>
-<script src="~/lib/leaflet/leaflet.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
+<script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
 
 <script>
     var map = L.map('map').setView([22.806284, 89.553149], 13);
@@ -75,19 +78,19 @@
     var friendIcons = [
         L.icon({
             iconUrl: '/icons/3001764.png',
-            iconSize: [25, 41],
+            iconSize: [41, 41],
             iconAnchor: [12, 41],
             popupAnchor: [1, -34],
         }),
         L.icon({
             iconUrl: '/icons/146031.png',
-            iconSize: [25, 41],
+            iconSize: [41, 41],
             iconAnchor: [12, 41],
             popupAnchor: [1, -34],
         }),
         L.icon({
             iconUrl: '/icons/man_person17.png',
-            iconSize: [25, 41],
+            iconSize: [41, 41],
             iconAnchor: [12, 41],
             popupAnchor: [1, -34],
         })
@@ -111,49 +114,70 @@
 
     var friends = @Html.Raw(friendsJson);
 
-    friends.forEach(function (friend, index) {
-        L.marker([friend.lat, friend.lon], {
-            icon: friendIcons[index % friendIcons.length]
-        }).addTo(map)
-            .bindPopup(friend.name);
-    });
+    // Automatically find the nearest friend
+    var userLocation = null;
 
-    // Automatically find nearest friend and draw path
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function (position) {
-            var lat = position.coords.latitude;
-            var lon = position.coords.longitude;
+            userLocation = {
+                lat: position.coords.latitude,
+                lon: position.coords.longitude
+            };
 
-            var myLocationMarker = L.marker([lat, lon], {
+            var myLocationMarker = L.marker([userLocation.lat, userLocation.lon], {
                 icon: L.icon({
-                    iconUrl: 'Icons/profile-pic (10).png',
-                    iconSize: [25, 41],
+                    iconUrl: '/icons/me.png',
+                    iconSize: [41, 41],
                     iconAnchor: [12, 41],
                     popupAnchor: [1, -34],
                 })
             }).addTo(map)
-                .bindPopup('You')
+                .bindPopup('My location.')
                 .openPopup();
 
-            var nearestFriend = null;
-            var nearestDistance = Infinity;
+            friends.forEach(function (friend, index) {
+                var distance = calculateDistance(userLocation.lat, userLocation.lon, friend.lat, friend.lon);
 
-            friends.forEach(function (friend) {
-                var distance = calculateDistance(lat, lon, friend.lat, friend.lon);
+                var marker = L.marker([friend.lat, friend.lon], {
+                    icon: friendIcons[index % friendIcons.length]
+                }).addTo(map)
+                    .bindPopup(friend.name + '<br>Distance: ' + distance.toFixed(2) + ' km');
 
-                if (distance < nearestDistance) {
-                    nearestDistance = distance;
-                    nearestFriend = friend;
-                }
+                marker.on('click', function () {
+                 
+                    if (map.routingControl) {
+                        map.removeControl(map.routingControl);
+                    }
+
+              
+                    map.routingControl = L.Routing.control({
+                        waypoints: [
+                            L.latLng(userLocation.lat, userLocation.lon),
+                            L.latLng(friend.lat, friend.lon)
+                        ],
+                        routeWhileDragging: true,
+                        router: L.Routing.osrmv1({
+                            serviceUrl: 'https://router.project-osrm.org/route/v1'
+                        }),
+                        showAlternatives: false,
+                        lineOptions: {
+                            styles: [{ color: 'blue', opacity: 0.6, weight: 4 }]
+                        },
+                        createMarker: function (i, waypoint, n) {
+                            var icon = (i === 0) ? myLocationMarker.getIcon() : friendIcons[index % friendIcons.length];
+                            return L.marker(waypoint.latLng, {
+                                icon: icon
+                            }).bindPopup((i === 0) ? 'Your current location.' : friend.name + '<br>Distance: ' + distance.toFixed(2) + ' km');
+                        }
+                    }).addTo(map)
+                        .on('routesfound', function (e) {
+                            document.getElementById('status-message').innerText = 'Routing successful!';
+                        })
+                        .on('routingerror', function (e) {
+                            document.getElementById('status-message').innerText = 'Routing failed: ' + e.error.message;
+                        });
+                });
             });
-
-            if (nearestFriend) {
-                L.polyline([
-                    [lat, lon],
-                    [nearestFriend.lat, nearestFriend.lon]
-                ], { color: 'blue' }).addTo(map)
-                    .bindPopup('Shortest path to ' + nearestFriend.name + ' (' + nearestDistance.toFixed(2) + ' km)');
-            }
         }, function () {
             alert('Geolocation failed.');
         });
