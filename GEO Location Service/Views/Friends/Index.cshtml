@@ -53,10 +53,10 @@
     </tbody>
 </table>
 
+<div id="map" style="width:100%; height:500px"></div>
+
 <script src="~/lib/leaflet/leaflet.js"></script>
 <script src="~/lib/leaflet/leaflet.min.js"></script>
-
-<div id="map" style="width:100%; height:500px"></div>
 
 <script>
     var map = L.map('map').setView([22.806284, 89.553149], 13);
@@ -65,7 +65,70 @@
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
 
-    L.marker([22.806284, 89.553149]).addTo(map)
-        .bindPopup('Your current location.<br> Easily customizable.')
-        .openPopup();
+    var friendIcons = [
+        L.icon({
+            iconUrl: 'Icons/3001764.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+        }),
+        L.icon({
+            iconUrl: 'Icons/146031.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+        }),
+        L.icon({
+            iconUrl: 'icons/man_person17.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+        })
+    ];
+
+    // Automatically show user's current location on page load
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+            var lat = position.coords.latitude;
+            var lon = position.coords.longitude;
+
+            map.setView([lat, lon], 13);
+
+            L.marker([lat, lon], {
+                icon: L.icon({
+                    iconUrl: 'icons/profile-pic (10).png',
+                    iconSize: [25, 41],
+                    iconAnchor: [12, 41],
+                    popupAnchor: [1, -34],
+                })
+            }).addTo(map)
+                .bindPopup('Me')
+                .openPopup();
+        }, function () {
+            alert('Geolocation failed.');
+        });
+    } else {
+        alert('Geolocation is not supported by this browser.');
+    }
+
+    // Loop through friends data
+    @foreach (var friend in Model)
+    {
+        <text>
+            L.marker([@friend.Let, @friend.Lon], { icon: friendIcons[@friend.Id % friendIcons.length] })
+                .addTo(map)
+                .bindPopup('@friend.Name')
+                .openPopup();
+        </text>
+    }
 </script>
+
+
+
+
+
+
+
+
+
+
