@@ -77,7 +77,7 @@ Distributed under the MIT License. See `LICENSE` for more information.
 Ensure you have a screenshot of your application in the `icons` folder named `screenshot.png`. Replace the `icons/screenshot.png` in the markdown with the path to your actual screenshot.
 
 
-![App Screenshot](https://raw.githubusercontent.com/aminul-islam-niloy/GEO-Location-Service/main/icons/Google map.png "App Screenshot")
+![App Screenshot](https://raw.githubusercontent.com/aminul-islam-niloy/GEO Location Service/wwwroot/Icons/Google map.png"App Screenshot")
 
 
 ### Adding CRUD Functionality
